@@ -18,7 +18,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <section className="relative h-[600px] overflow-hidden">
+    <section className="relative h-[800px] overflow-hidden">
       {heroImages.map((src, i) => (
         <img
           key={src}
