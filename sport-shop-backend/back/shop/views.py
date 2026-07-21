@@ -1,9 +1,8 @@
 from rest_framework import generics, permissions, viewsets
-from .models import Product, Variant, Ebook, ContenuEbook, EbookDocument, Order
+from .models import Product, Variant, Ebook, Order
 from .serializers import (
     ProductSerializer, EbookSerializer, EbookListSerializer, OrderSerializer,
-    AdminProductSerializer, AdminVariantSerializer, AdminEbookSerializer, AdminContenuEbookSerializer,
-    EbookDocumentSerializer,
+    AdminProductSerializer, AdminVariantSerializer, AdminEbookSerializer,
 )
 
 
@@ -65,17 +64,6 @@ class AdminEbookViewSet(viewsets.ModelViewSet):
     queryset = Ebook.objects.all().order_by("-id")
     serializer_class = AdminEbookSerializer
     permission_classes = [permissions.IsAdminUser]
-
-class AdminEbookDocumentViewSet(viewsets.ModelViewSet):
-    queryset = EbookDocument.objects.all().order_by("-id")
-    serializer_class = EbookDocumentSerializer
-    permission_classes = [permissions.IsAdminUser]
-
-class AdminContenuEbookViewSet(viewsets.ModelViewSet):
-    queryset = ContenuEbook.objects.all()
-    serializer_class = AdminContenuEbookSerializer
-    permission_classes = [permissions.IsAdminUser]
-
 
 class AdminOrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all().order_by("-date_creation")

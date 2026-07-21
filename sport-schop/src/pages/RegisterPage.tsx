@@ -27,7 +27,7 @@ export default function RegisterPage() {
     setEnvoi(true);
     try {
       await register(form);
-      navigate("/connexion");
+      navigate("/login");
     } catch (err: any) {
       const data = err?.response?.data;
       if (data) {
@@ -42,11 +42,11 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto px-6 py-20">
+    <div className="w-full max-w-md mx-auto px-4 sm:px-6 py-12 sm:py-20">
       <h1 className="text-2xl font-bold mb-8 text-center">Créer un compte</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Prénom</label>
             <input type="text" name="first_name" value={form.first_name} onChange={handleChange}
@@ -75,6 +75,9 @@ export default function RegisterPage() {
           <label className="block text-sm font-medium mb-1">Mot de passe</label>
           <input type="password" name="password" required value={form.password} onChange={handleChange}
             className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:border-primary" />
+          <p className="text-xs text-gray-500 mt-2">
+            Le mot de passe doit contenir au moins une lettre majuscule, une minuscule et un caractère spécial.
+          </p>
         </div>
 
         <div>
@@ -83,7 +86,12 @@ export default function RegisterPage() {
             className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:border-primary" />
         </div>
 
-        {erreur && <p className="text-red-600 text-sm">{erreur}</p>}
+        {erreur && (
+          <div className="rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm">
+            <p className="font-medium">Erreur</p>
+            <p>{erreur}</p>
+          </div>
+        )}
 
         <button type="submit" disabled={envoi}
           className="w-full bg-primary text-white py-3 text-sm font-medium hover:bg-primary-dark transition disabled:opacity-50 mt-2">

@@ -31,11 +31,11 @@ export default function HomePage() {
       ))}
       <div className="absolute inset-0 bg-black/45" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 h-full flex flex-col justify-center text-white">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 h-full flex flex-col justify-center text-white">
         <p className="text-sm font-medium tracking-widest uppercase text-primary-light mb-4">
           By PRODOC PLUS
         </p>
-        <h1 className="text-3xl md:text-5xl font-bold mb-6 max-w-xl leading-tight">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 max-w-xl leading-tight">
           Des programmes structurés pour une progression réelle
         </h1>
         <p className="text-white/85 max-w-md mb-8 leading-relaxed">

@@ -6,8 +6,6 @@ router = DefaultRouter()
 router.register(r"admin/produits", views.AdminProductViewSet, basename="admin-produits")
 router.register(r"admin/variants", views.AdminVariantViewSet, basename="admin-variants")
 router.register(r"admin/ebooks", views.AdminEbookViewSet, basename="admin-ebooks")
-router.register(r"admin/ebook-documents", views.AdminEbookDocumentViewSet, basename="admin-ebook-documents")
-router.register(r"admin/contenu-ebooks", views.AdminContenuEbookViewSet, basename="admin-contenu-ebooks")
 router.register(r"admin/commandes", views.AdminOrderViewSet, basename="admin-commandes")
 
 urlpatterns = [

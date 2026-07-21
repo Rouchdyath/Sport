@@ -1,21 +1,11 @@
 from django.contrib import admin
-from .models import Product, Variant, Ebook, ContenuEbook, EbookDocument, Order, OrderItem
+from .models import Product, Variant, Ebook, Order, OrderItem
 
 
 class VariantInline(admin.TabularInline):
     model = Variant
     extra = 1
     fields = ["couleur", "qualite", "prix", "image", "stock"]
-
-
-class ContenuEbookInline(admin.TabularInline):
-    model = ContenuEbook
-    extra = 1
-
-
-class EbookDocumentInline(admin.TabularInline):
-    model = EbookDocument
-    extra = 1
 
 
 class OrderItemInline(admin.TabularInline):
@@ -48,7 +38,6 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(Ebook)
 class EbookAdmin(admin.ModelAdmin):
     list_display = ["nom", "prix"]
-    inlines = [ContenuEbookInline, EbookDocumentInline]
 
 
 @admin.register(Order)

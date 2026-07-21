@@ -1,15 +1,18 @@
 import { Link } from "react-router-dom";
 import { ShoppingCart, User } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 export default function Header() {
   const { user } = useAuth();
+  const { items } = useCart();
+  const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
-      <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
+      <div className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
         <Link to="/" className="flex items-center flex-shrink-0">
-          <img src="/images/logos.png" alt="PRODOC Plus" className="h-10 w-auto" />
+          <img src="/images/logos.png" alt="PRODOC Plus" className="h-8 sm:h-10 w-auto" />
         </Link>
 
         <nav className="hidden md:flex gap-8 text-sm font-medium text-gray-700">
@@ -20,8 +23,13 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-5">
-          <Link to="/panier" className="hover:text-primary">
+          <Link to="/panier" className="relative hover:text-primary">
             <ShoppingCart size={20} />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-white">
+                {cartCount}
+              </span>
+            )}
           </Link>
 
           {user ? (

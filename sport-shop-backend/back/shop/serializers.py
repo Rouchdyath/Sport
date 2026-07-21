@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Variant, Ebook, ContenuEbook, EbookDocument, Order, OrderItem
+from .models import Product, Variant, Ebook, Order, OrderItem
 
 
 class VariantSerializer(serializers.ModelSerializer):
@@ -16,32 +16,10 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ["id", "nom", "categorie", "description", "prix", "image", "stock", "variants"]
 
 
-class ContenuEbookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ContenuEbook
-        fields = ["id", "titre", "description", "ordre"]
-
-
-class EbookDocumentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EbookDocument
-        fields = ["id", "ebook", "fichier_pdf", "titre", "niveau"]
-
-    def validate_fichier_pdf(self, value):
-        if value.size > 5 * 1024 * 1024:
-            raise serializers.ValidationError("Le fichier PDF ne doit pas dépasser 5 Mo.")
-        if not value.name.lower().endswith(".pdf"):
-            raise serializers.ValidationError("Seul le format PDF est autorisé.")
-        return value
-
-
 class EbookSerializer(serializers.ModelSerializer):
-    contenu = ContenuEbookSerializer(many=True, read_only=True)
-    documents = EbookDocumentSerializer(many=True, read_only=True)
-
     class Meta:
         model = Ebook
-        fields = ["id", "nom", "description", "prix", "image", "fichier_pdf", "contenu", "documents"]
+        fields = ["id", "nom", "description", "prix", "image", "fichier_pdf"]
 
 
 class EbookListSerializer(serializers.ModelSerializer):
@@ -148,15 +126,6 @@ class AdminProductSerializer(serializers.ModelSerializer):
 
 
 class AdminEbookSerializer(serializers.ModelSerializer):
-    contenu = ContenuEbookSerializer(many=True, read_only=True)
-    documents = EbookDocumentSerializer(many=True, read_only=True)
-
     class Meta:
         model = Ebook
-        fields = ["id", "nom", "description", "prix", "image", "fichier_pdf", "contenu", "documents"]
-
-
-class AdminContenuEbookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ContenuEbook
-        fields = ["id", "ebook", "titre", "description", "ordre"]
+        fields = ["id", "nom", "description", "prix", "image", "fichier_pdf"]

@@ -1,149 +1,168 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 import api from "../../api/axios";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { Eye, Truck, CheckCircle2, Clock, XCircle } from "lucide-react";
 
 type OrderItem = {
+  product: number | null;
+  variant: number | null;
+  ebook: number | null;
   quantite: number;
   prix_unitaire: number;
-  nom_article: string;
-  image_article: string | null;
 };
 
 type Order = {
   id: number;
   nom_client: string;
   telephone: string;
+  adresse: string;
   ville: string;
   mode_paiement: string;
-  statut: string;
+  statut: "en_attente" | "confirmee" | "livree" | "annulee";
   total: number;
   date_creation: string;
   items: OrderItem[];
 };
 
-const statutLabels: Record<string, string> = {
-  en_attente: "En attente",
-  confirmee: "Confirmée",
-  livree: "Livrée",
-  annulee: "Annulée",
-};
-
-const statutColors: Record<string, string> = {
-  en_attente: "bg-yellow-100 text-yellow-800",
-  confirmee: "bg-blue-100 text-blue-800",
-  livree: "bg-green-100 text-green-800",
-  annulee: "bg-red-100 text-red-800",
+const statutConfig = {
+  en_attente: { label: "En attente", color: "bg-orange-50 text-orange-700", icon: Clock },
+  confirmee: { label: "Confirmée", color: "bg-primary/10 text-primary-dark", icon: CheckCircle2 },
+  livree: { label: "Livrée", color: "bg-green-50 text-green-700", icon: Truck },
+  annulee: { label: "Annulée", color: "bg-red-50 text-red-700", icon: XCircle },
 };
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [commandes, setCommandes] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState<number | null>(null);
+  const [filtre, setFiltre] = useState<string>("toutes");
+  const [detailOuvert, setDetailOuvert] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchOrders();
+    fetchCommandes();
   }, []);
 
-  function fetchOrders() {
+  function fetchCommandes() {
     api.get("/admin/commandes/").then((res) => {
-      setOrders(res.data);
+      setCommandes(res.data);
       setLoading(false);
     });
   }
 
-  async function handleStatutChange(orderId: number, newStatut: string) {
-    await api.patch(`/admin/commandes/${orderId}/`, { statut: newStatut });
-    fetchOrders();
+  async function changerStatut(id: number, statut: string) {
+    await api.patch(`/admin/commandes/${id}/`, { statut });
+    fetchCommandes();
   }
 
-  function toggleExpand(orderId: number) {
-    setExpanded(expanded === orderId ? null : orderId);
-  }
+  const commandesFiltrees =
+    filtre === "toutes" ? commandes : commandes.filter((c) => c.statut === filtre);
+
+  const tabs = [
+    { key: "toutes", label: "Toutes" },
+    { key: "en_attente", label: "En attente" },
+    { key: "confirmee", label: "Confirmées" },
+    { key: "livree", label: "Livrées" },
+    { key: "annulee", label: "Annulées" },
+  ];
 
   if (loading) return <div className="p-8 text-gray-500">Chargement...</div>;
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-8">Commandes</h1>
+      <h1 className="text-2xl font-bold text-[#14231F] mb-1">Commandes</h1>
+      <p className="text-sm text-gray-500 mb-6">Total : {commandes.length} commandes</p>
 
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="flex gap-2 mb-6 border-b border-gray-200">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setFiltre(tab.key)}
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition ${
+              filtre === tab.key
+                ? "border-primary text-primary-dark"
+                : "border-transparent text-gray-500 hover:text-primary"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-200">
+          <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
             <tr>
-              <th className="text-left px-4 py-3 font-medium text-gray-600"></th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">#</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Client</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Ville</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Paiement</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Articles</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Total</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Date</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Statut</th>
+              <th className="text-left px-5 py-3">Client</th>
+              <th className="text-left px-5 py-3">Ville</th>
+              <th className="text-left px-5 py-3">Paiement</th>
+              <th className="text-left px-5 py-3">Total</th>
+              <th className="text-left px-5 py-3">Statut</th>
+              <th className="text-left px-5 py-3">Date</th>
+              <th className="text-left px-5 py-3"></th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
-              <Fragment key={order.id}>
-                <tr className="border-b border-gray-100 last:border-0">
-                  <td className="px-4 py-3">
-                    <button onClick={() => toggleExpand(order.id)} className="text-gray-400 hover:text-black">
-                      {expanded === order.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 font-medium">#{order.id}</td>
-                  <td className="px-4 py-3">
-                    {order.nom_client}
-                    <span className="block text-xs text-gray-400">{order.telephone}</span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-500">{order.ville}</td>
-                  <td className="px-4 py-3 text-gray-500 text-xs break-words max-w-[150px]">{order.mode_paiement}</td>
-                  <td className="px-4 py-3 text-gray-500">{order.items.length}</td>
-                  <td className="px-4 py-3 font-medium">{order.total.toLocaleString()} FCFA</td>
-                  <td className="px-4 py-3 text-gray-500 text-xs">
-                    {new Date(order.date_creation).toLocaleDateString("fr-FR")}
-                  </td>
-                  <td className="px-4 py-3">
-                    <select
-                      value={order.statut}
-                      onChange={(e) => handleStatutChange(order.id, e.target.value)}
-                      className={`text-xs px-2 py-1 rounded border-0 font-medium ${statutColors[order.statut]}`}
-                    >
-                      {Object.entries(statutLabels).map(([value, label]) => (
-                        <option key={value} value={value}>{label}</option>
-                      ))}
-                    </select>
-                  </td>
-                </tr>
-
-                {expanded === order.id && (
-                  <tr className="bg-gray-50 border-b border-gray-100">
-                    <td colSpan={9} className="px-4 py-4">
-                      <p className="text-xs font-medium text-gray-500 mb-3">Articles commandés</p>
-                      <div className="space-y-2">
-                        {order.items.map((item, i) => (
-                          <div key={i} className="flex items-center gap-3 bg-white border border-gray-200 rounded p-2">
-                            {item.image_article && (
-                              <img src={item.image_article} alt="" className="w-10 h-10 object-cover rounded" />
-                            )}
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">{item.nom_article}</p>
-                              <p className="text-xs text-gray-500">
-                                Quantité : {item.quantite} × {item.prix_unitaire.toLocaleString()} FCFA
-                              </p>
-                            </div>
-                            <p className="text-sm font-medium">
-                              {(item.quantite * item.prix_unitaire).toLocaleString()} FCFA
-                            </p>
-                          </div>
-                        ))}
-                      </div>
+            {commandesFiltrees.map((commande) => {
+              const config = statutConfig[commande.statut];
+              const StatutIcon = config.icon;
+              return (
+                <>
+                  <tr key={commande.id} className="border-t border-gray-100 hover:bg-gray-50">
+                    <td className="px-5 py-4">
+                      <p className="font-medium text-[#14231F]">{commande.nom_client}</p>
+                      <p className="text-xs text-gray-400">{commande.telephone}</p>
+                    </td>
+                    <td className="px-5 py-4 text-gray-600">{commande.ville}</td>
+                    <td className="px-5 py-4 text-gray-600">{commande.mode_paiement}</td>
+                    <td className="px-5 py-4 font-semibold text-[#14231F]">
+                      {commande.total.toLocaleString()} FCFA
+                    </td>
+                    <td className="px-5 py-4">
+                      <select
+                        value={commande.statut}
+                        onChange={(e) => changerStatut(commande.id, e.target.value)}
+                        className={`text-xs font-medium rounded-full px-3 py-1.5 border-0 cursor-pointer ${config.color}`}
+                      >
+                        <option value="en_attente">En attente</option>
+                        <option value="confirmee">Confirmée</option>
+                        <option value="livree">Livrée</option>
+                        <option value="annulee">Annulée</option>
+                      </select>
+                    </td>
+                    <td className="px-5 py-4 text-gray-500 text-xs">
+                      {new Date(commande.date_creation).toLocaleDateString("fr-FR")}
+                    </td>
+                    <td className="px-5 py-4">
+                      <button
+                        onClick={() => setDetailOuvert(detailOuvert === commande.id ? null : commande.id)}
+                        className="text-gray-400 hover:text-primary"
+                      >
+                        <Eye size={18} />
+                      </button>
                     </td>
                   </tr>
-                )}
-                </Fragment>
-            ))}
+                  {detailOuvert === commande.id && (
+                    <tr className="bg-gray-50/50">
+                      <td colSpan={7} className="px-5 py-4">
+                        <p className="text-xs text-gray-500 mb-2">Adresse : {commande.adresse}</p>
+                        <div className="space-y-1">
+                          {commande.items.map((item, i) => (
+                            <p key={i} className="text-xs text-gray-600">
+                              • Article #{item.product ?? item.variant ?? item.ebook} × {item.quantite} —{" "}
+                              {(item.prix_unitaire * item.quantite).toLocaleString()} FCFA
+                            </p>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
+              );
+            })}
           </tbody>
         </table>
+
+        {commandesFiltrees.length === 0 && (
+          <p className="text-center text-gray-400 py-10 text-sm">Aucune commande dans cette catégorie.</p>
+        )}
       </div>
     </div>
   );

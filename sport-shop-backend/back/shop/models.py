@@ -15,8 +15,8 @@ class Product(models.Model):
     nom = models.CharField(max_length=200)
     categorie = models.CharField(max_length=50, choices=CATEGORIE_CHOICES)
     description = models.TextField()
-    prix = models.PositiveIntegerField(null=True, blank=True)
-    image = models.ImageField(upload_to="produits/", null=True, blank=True)
+    prix = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    image = models.ImageField(upload_to="produits/", blank=True)
     stock = models.PositiveIntegerField(default=0, help_text="Stock uniquement si le produit n'a pas de variantes")
 
     def __str__(self):
@@ -27,7 +27,7 @@ class Variant(models.Model):
     product = models.ForeignKey(Product, related_name="variants", on_delete=models.CASCADE)
     couleur = models.CharField(max_length=50)
     qualite = models.CharField(max_length=50)
-    prix = models.PositiveIntegerField()
+    prix = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to="variants/")
     stock = models.PositiveIntegerField(default=0)
 
@@ -37,7 +37,7 @@ class Variant(models.Model):
 class Ebook(models.Model):
     nom = models.CharField(max_length=200)
     description = models.TextField()
-    prix = models.PositiveIntegerField()
+    prix = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to="ebooks/covers/")
     fichier_pdf = models.FileField(upload_to="ebooks/pdf/")
 
@@ -45,30 +45,7 @@ class Ebook(models.Model):
         return self.nom
 
 
-class EbookDocument(models.Model):
-    ebook = models.ForeignKey(Ebook, related_name="documents", on_delete=models.CASCADE)
-    fichier_pdf = models.FileField(upload_to="ebooks/pdf/")
-    titre = models.CharField(max_length=200, blank=True)
-    niveau = models.CharField(max_length=50, blank=True)
 
-    class Meta:
-        ordering = ["id"]
-
-    def __str__(self):
-        return self.titre or self.fichier_pdf.name
-
-
-class ContenuEbook(models.Model):
-    ebook = models.ForeignKey(Ebook, related_name="contenu", on_delete=models.CASCADE)
-    titre = models.CharField(max_length=200)
-    description = models.TextField()
-    ordre = models.PositiveIntegerField(default=0)
-
-    class Meta:
-        ordering = ["ordre"]
-
-    def __str__(self):
-        return self.titre
 
 
 class Order(models.Model):
@@ -80,13 +57,13 @@ class Order(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    nom_client = models.CharField(max_length=200)
+    nom_client = models.CharField(max_length=100)
     telephone = models.CharField(max_length=30)
     adresse = models.CharField(max_length=255)
     ville = models.CharField(max_length=100)
     mode_paiement = models.CharField(max_length=50, default="Paiement à la livraison")
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default="en_attente")
-    total = models.PositiveIntegerField()
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     date_creation = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

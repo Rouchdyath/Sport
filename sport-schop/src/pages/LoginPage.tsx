@@ -6,7 +6,7 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [erreur, setErreur] = useState("");
   const [envoi, setEnvoi] = useState(false);
@@ -18,16 +18,17 @@ export default function LoginPage() {
     setErreur("");
     setEnvoi(true);
     try {
-      const user = await login(username, password);
+      const user = await login(email, password);
 
       if (user.is_staff) {
         navigate("/admin-dashboard");
       } else if (from) {
         navigate(from);
       } else {
-        navigate("/checkout");
+        navigate("/Checkout");
       }
     } catch (err) {
+      console.log(err)
       setErreur("Identifiants incorrects.");
     } finally {
       setEnvoi(false);
@@ -35,16 +36,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto px-6 py-20">
+    <div className="w-full max-w-md mx-auto px-4 sm:px-6 py-12 sm:py-20">
       <h1 className="text-2xl font-bold mb-8 text-center">Connexion</h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block text-sm font-medium mb-1">Nom d'utilisateur</label>
+          <label className="block text-sm font-medium mb-1">Votre email</label>
           <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
             className="w-full border border-gray-300 px-4 py-2 rounded focus:outline-none focus:border-primary"
           />

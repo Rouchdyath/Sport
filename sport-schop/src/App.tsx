@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import Header from "./components/Header";
+import Header from "./components/header";
 import Footer from "./components/Footer";
 import HomePage from "./pages/HomePage";
 import ProductDetailPage from "./pages/ProductDetailPage";
@@ -21,12 +21,13 @@ import AdminProductFormPage from "./pages/admin/AdminProductFormPage";
 import AdminEbooksPage from "./pages/admin/AdminEbooksPage";
 import AdminEbookFormPage from "./pages/admin/AdminEbookFormPage";
 import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
-function PublicLayout({ children }: { children: React.ReactNode }) {
+
+function PublicLayout({ children, hideHeader = false, hideFooter = false }: { children: React.ReactNode; hideHeader?: boolean; hideFooter?: boolean }) {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      {!hideHeader && <Header />}
       <main className="flex-1">{children}</main>
-      <Footer />
+      {!hideFooter && <Footer />}
     </div>
   );
 }
@@ -44,8 +45,8 @@ export default function App() {
       <Route path="/confirmation" element={<PublicLayout><ConfirmationPage /></PublicLayout>} />
       <Route path="/ebooks" element={<PublicLayout><EbooksPage /></PublicLayout>} />
       <Route path="/ebook/:id" element={<PublicLayout><EbookDetailPage /></PublicLayout>} />
-      <Route path="/login" element={<PublicLayout><LoginPage /></PublicLayout>} />
-      <Route path="/register" element={<PublicLayout><RegisterPage /></PublicLayout>} />
+      <Route path="/login" element={<PublicLayout hideHeader hideFooter><LoginPage /></PublicLayout>} />
+      <Route path="/register" element={<PublicLayout hideHeader hideFooter><RegisterPage /></PublicLayout>} />
       <Route path="/mon-compte" element={<PublicLayout><MonComptePage /></PublicLayout>} />
       
 
@@ -60,6 +61,7 @@ export default function App() {
         <Route path="ebooks/nouveau" element={<AdminEbookFormPage />} />
         <Route path="ebooks/:id" element={<AdminEbookFormPage />} />
         <Route path="commandes" element={<AdminOrdersPage />} />
+        <Route path="/admin-dashboard/produits" element={<AdminProductsPage />} />
       </Route>
     </Routes>
   );

@@ -19,13 +19,13 @@ export default function EbooksPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
       <h1 className="text-2xl font-bold mb-2 text-center">Nos E-books</h1>
       <p className="text-gray-500 text-center text-sm mb-10">
         Des guides PDF pour progresser plus vite, à télécharger après achat.
       </p>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {ebooks.map((ebook) => (
           <EbookCard key={ebook.id} ebook={ebook} />
         ))}
